@@ -302,7 +302,7 @@ class GooglePlaces(object):
             error_detail = ('Lat/Lng \'%s\' can\'t be determined.' %
                             location)
             raise GooglePlacesError(error_detail)
-        return geo_response['results'][0]
+        return geo_response['results']
 
     def text_search(self, query, language=lang.ENGLISH, lat_lng=None,
                     radius=3200, types=[], location=None, pagetoken=None):
