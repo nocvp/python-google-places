@@ -108,30 +108,6 @@ def geocode_location(location, sensor=False):
         raise GooglePlacesError(error_detail)
     return geo_response['results'][0]['geometry']['location']
 
-def geocode_location_by_coordinates(coordinates, sensor=False):
-    """Converts a human-readable location to lat-lng.
-
-    Returns a dict with lat and lng keys.
-
-    keyword arguments:
-    coordinates -- lat lng dict coordinates
-    sensor   -- Boolean flag denoting if the location came from a device using
-                its' location sensor (default False)
-
-    raises:
-    GooglePlacesError -- if the geocoder fails to find a location.
-    """
-    location = coordinates['lat'] + ',' + coordinates['lng']
-
-    url, geo_response = _fetch_remote_json(GooglePlaces.GEOCODE_API_URL, {'latlng': location,
-                                                                          'sensor': str(sensor).lower()})
-    _validate_response(url, geo_response)
-    if geo_response['status'] == GooglePlaces.RESPONSE_STATUS_ZERO_RESULTS:
-        error_detail = ('Lat/Lng \'%s\' can\'t be determined.' %
-                        location)
-        raise GooglePlacesError(error_detail)
-    return geo_response['results'][0]
-
 def _get_place_details(place_id, api_key, sensor=False,
                        language=lang.ENGLISH):
     """Gets a detailed place response.
@@ -303,6 +279,30 @@ class GooglePlaces(object):
                 GooglePlaces.NEARBY_SEARCH_API_URL, self._request_params)
         _validate_response(url, places_response)
         return GooglePlacesSearchResult(self, places_response)
+
+    def geocode_location_by_coordinates(self, coordinates, sensor=False):
+        """Converts a human-readable location to lat-lng.
+
+        Returns a dict with lat and lng keys.
+
+        keyword arguments:
+        coordinates -- lat lng dict coordinates
+        sensor   -- Boolean flag denoting if the location came from a device using
+                    its' location sensor (default False)
+
+        raises:
+        GooglePlacesError -- if the geocoder fails to find a location.
+        """
+        location = coordinates['lat'] + ',' + coordinates['lng']
+
+        url, geo_response = _fetch_remote_json(GooglePlaces.GEOCODE_API_URL, {'latlng': location,
+                                                                              'sensor': str(sensor).lower()})
+        _validate_response(url, geo_response)
+        if geo_response['status'] == GooglePlaces.RESPONSE_STATUS_ZERO_RESULTS:
+            error_detail = ('Lat/Lng \'%s\' can\'t be determined.' %
+                            location)
+            raise GooglePlacesError(error_detail)
+        return geo_response['results'][0]
 
     def text_search(self, query, language=lang.ENGLISH, lat_lng=None,
                     radius=3200, types=[], location=None, pagetoken=None):
