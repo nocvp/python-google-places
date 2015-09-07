@@ -293,7 +293,7 @@ class GooglePlaces(object):
         raises:
         GooglePlacesError -- if the geocoder fails to find a location.
         """
-        location = coordinates['lat'] + ',' + coordinates['lng']
+        location = str(coordinates['lat']) + ',' + str(coordinates['lng'])
 
         url, geo_response = _fetch_remote_json(GooglePlaces.GEOCODE_API_URL, {'latlng': location,
                                                                               'sensor': str(sensor).lower()})
