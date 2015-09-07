@@ -299,13 +299,13 @@ class GooglePlaces(object):
 
         url, geo_response = _fetch_remote_json(GooglePlaces.GEOCODE_API_URL, {'latlng': location,
                                                                               'sensor': str(sensor).lower()})
-        _validate_response(url, geo_response)
 
         while geo_response['status'] == GooglePlaces.RESPONSE_STATUS_OVER_QUERY_LIMIT:
             time.sleep(2)
             url, geo_response = _fetch_remote_json(GooglePlaces.GEOCODE_API_URL, {'latlng': location,
                                                                                   'sensor': str(sensor).lower()})
             _validate_response(url, geo_response)
+        _validate_response(url, geo_response)
 
         if geo_response['status'] == GooglePlaces.RESPONSE_STATUS_ZERO_RESULTS:
             error_detail = ('Lat/Lng \'%s\' can\'t be determined.' %
