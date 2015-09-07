@@ -15,6 +15,7 @@ production environment.
 from __future__ import absolute_import
 
 import cgi
+import time
 try:
     import json
 except ImportError:
@@ -201,6 +202,7 @@ class GooglePlaces(object):
     MAXIMUM_SEARCH_RADIUS = 50000
     RESPONSE_STATUS_OK = 'OK'
     RESPONSE_STATUS_ZERO_RESULTS = 'ZERO_RESULTS'
+    RESPONSE_STATUS_OVER_QUERY_LIMIT = 'OVER_QUERY_LIMIT'
 
     def __init__(self, api_key):
         self._api_key = api_key
@@ -298,6 +300,13 @@ class GooglePlaces(object):
         url, geo_response = _fetch_remote_json(GooglePlaces.GEOCODE_API_URL, {'latlng': location,
                                                                               'sensor': str(sensor).lower()})
         _validate_response(url, geo_response)
+
+        while geo_response['status'] == GooglePlaces.RESPONSE_STATUS_OVER_QUERY_LIMIT:
+            time.sleep(2)
+            url, geo_response = _fetch_remote_json(GooglePlaces.GEOCODE_API_URL, {'latlng': location,
+                                                                                  'sensor': str(sensor).lower()})
+            _validate_response(url, geo_response)
+
         if geo_response['status'] == GooglePlaces.RESPONSE_STATUS_ZERO_RESULTS:
             error_detail = ('Lat/Lng \'%s\' can\'t be determined.' %
                             location)
