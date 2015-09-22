@@ -187,17 +187,17 @@ class GooglePlaces(object):
     """A wrapper around the Google Places Query API."""
 
     BASE_URL = 'https://maps.googleapis.com/maps/api'
-    PLACE_URL = BASE_URL + '/place'
-    GEOCODE_API_URL = BASE_URL + '/geocode/json?'
-    RADAR_SEARCH_API_URL = PLACE_URL + '/radarsearch/json?'
-    NEARBY_SEARCH_API_URL = PLACE_URL + '/nearbysearch/json?'
-    TEXT_SEARCH_API_URL = PLACE_URL + '/textsearch/json?'
-    AUTOCOMPLETE_API_URL = PLACE_URL + '/autocomplete/json?'
-    DETAIL_API_URL = PLACE_URL + '/details/json?'
+    PLACE_URL = BASE_URL + '/placesensor=%s&key=%s'
+    GEOCODE_API_URL = BASE_URL + '/geocode/json?sensor=%s&key=%s'
+    RADAR_SEARCH_API_URL = PLACE_URL + '/radarsearch/json?sensor=%s&key=%s'
+    NEARBY_SEARCH_API_URL = PLACE_URL + '/nearbysearch/json?sensor=%s&key=%s'
+    TEXT_SEARCH_API_URL = PLACE_URL + '/textsearch/json?sensor=%s&key=%s'
+    AUTOCOMPLETE_API_URL = PLACE_URL + '/autocomplete/json?sensor=%s&key=%s'
+    DETAIL_API_URL = PLACE_URL + '/details/json?sensor=%s&key=%s'
     CHECKIN_API_URL = PLACE_URL + '/check-in/json?sensor=%s&key=%s'
     ADD_API_URL = PLACE_URL + '/add/json?sensor=%s&key=%s'
     DELETE_API_URL = PLACE_URL + '/delete/json?sensor=%s&key=%s'
-    PHOTO_API_URL = PLACE_URL + '/photo?'
+    PHOTO_API_URL = PLACE_URL + '/photo?sensor=%s&key=%s'
 
     MAXIMUM_SEARCH_RADIUS = 50000
     RESPONSE_STATUS_OK = 'OK'
@@ -276,6 +276,7 @@ class GooglePlaces(object):
             self._request_params['language'] = language
         if pagetoken is not None:
             self._request_params['pagetoken'] = pagetoken
+        self._request_params['key'] = self.api_key
         self._add_required_param_keys()
         url, places_response = _fetch_remote_json(
                 GooglePlaces.NEARBY_SEARCH_API_URL, self._request_params)
@@ -297,12 +298,12 @@ class GooglePlaces(object):
         """
         location = str(coordinates['lat']) + ',' + str(coordinates['lng'])
 
-        url, geo_response = _fetch_remote_json(GooglePlaces.GEOCODE_API_URL, {'latlng': location,
+        url, geo_response = _fetch_remote_json(GooglePlaces.GEOCODE_API_URL, {'latlng': location, 'key': self.api_key,
                                                                               'sensor': str(sensor).lower()})
 
         while geo_response['status'] == GooglePlaces.RESPONSE_STATUS_OVER_QUERY_LIMIT:
             time.sleep(2)
-            url, geo_response = _fetch_remote_json(GooglePlaces.GEOCODE_API_URL, {'latlng': location,
+            url, geo_response = _fetch_remote_json(GooglePlaces.GEOCODE_API_URL, {'latlng': location, 'key': self.api_key,
                                                                                   'sensor': str(sensor).lower()})
         _validate_response(url, geo_response)
 
@@ -344,6 +345,7 @@ class GooglePlaces(object):
             self._request_params['language'] = language
         if pagetoken is not None:
             self._request_params['pagetoken'] = pagetoken
+        self._request_params['key'] = self.api_key
         self._add_required_param_keys()
         url, places_response = _fetch_remote_json(
                 GooglePlaces.TEXT_SEARCH_API_URL, self._request_params)
@@ -391,6 +393,7 @@ class GooglePlaces(object):
                                                      c[0],c[1]) for c in components])
         if language is not None:
             self._request_params['language'] = language
+        self._request_params['key'] = self.api_key
         self._add_required_param_keys()
         url, places_response = _fetch_remote_json(
                 GooglePlaces.AUTOCOMPLETE_API_URL, self._request_params)
@@ -451,6 +454,7 @@ class GooglePlaces(object):
             self._request_params['language'] = language
         if opennow is True:
             self._request_params['opennow'] = 'true'
+        self._request_params['key'] = self.api_key
         self._add_required_param_keys()
         url, places_response = _fetch_remote_json(
                 GooglePlaces.RADAR_SEARCH_API_URL, self._request_params)
