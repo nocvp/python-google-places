@@ -302,7 +302,7 @@ class GooglePlaces(object):
                                                                               'sensor': str(sensor).lower()})
 
         while geo_response['status'] == GooglePlaces.RESPONSE_STATUS_OVER_QUERY_LIMIT:
-            time.sleep(2)
+            time.sleep(0.15)
             url, geo_response = _fetch_remote_json(GooglePlaces.GEOCODE_API_URL, {'latlng': location,
                                                                                   'key': self.api_key,
                                                                                   'sensor': str(sensor).lower()})
