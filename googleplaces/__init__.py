@@ -283,13 +283,14 @@ class GooglePlaces(object):
         _validate_response(url, places_response)
         return GooglePlacesSearchResult(self, places_response)
 
-    def geocode_location_by_coordinates(self, coordinates, sensor=False):
+    def geocode_location_by_coordinates(self, coordinates, language=None, sensor=False):
         """Converts a human-readable location to lat-lng.
 
         Returns a dict with lat and lng keys.
 
         keyword arguments:
         coordinates -- lat lng dict coordinates
+        language -- geocode language code (default None)
         sensor   -- Boolean flag denoting if the location came from a device using
                     its' location sensor (default False)
 
@@ -299,13 +300,15 @@ class GooglePlaces(object):
         location = str(coordinates['lat']) + ',' + str(coordinates['lng'])
 
         url, geo_response = _fetch_remote_json(GooglePlaces.GEOCODE_API_URL, {'latlng': location, 'key': self.api_key,
-                                                                              'sensor': str(sensor).lower()})
+                                                                              'sensor': str(sensor).lower(),
+                                                                              'language': language})
 
         while geo_response['status'] == GooglePlaces.RESPONSE_STATUS_OVER_QUERY_LIMIT:
             time.sleep(0.15)
             url, geo_response = _fetch_remote_json(GooglePlaces.GEOCODE_API_URL, {'latlng': location,
                                                                                   'key': self.api_key,
-                                                                                  'sensor': str(sensor).lower()})
+                                                                                  'sensor': str(sensor).lower(),
+                                                                                  'language': language})
         _validate_response(url, geo_response)
 
         if geo_response['status'] == GooglePlaces.RESPONSE_STATUS_ZERO_RESULTS:
